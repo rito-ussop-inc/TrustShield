@@ -1,11 +1,11 @@
 # TrustShield
 
-![GitHub repo size](https://img.shields.io/github/repo-size/Ritoyash/TrustShield)
-![GitHub language count](https://img.shields.io/github/languages/count/Ritoyash/TrustShield)
-![GitHub top language](https://img.shields.io/github/languages/top/Ritoyash/TrustShield)
-![GitHub last commit](https://img.shields.io/github/last-commit/Ritoyash/TrustShield)
-![GitHub issues](https://img.shields.io/github/issues/Ritoyash/TrustShield)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/Ritoyash/TrustShield)
+![GitHub repo size](https://img.shields.io/github/repo-size/rito-ussop-inc/TrustShield)
+![GitHub language count](https://img.shields.io/github/languages/count/rito-ussop-inc/TrustShield)
+![GitHub top language](https://img.shields.io/github/languages/top/rito-ussop-inc/TrustShield)
+![GitHub last commit](https://img.shields.io/github/last-commit/rito-ussop-inc/TrustShield)
+![GitHub issues](https://img.shields.io/github/issues/rito-ussop-inc/TrustShield)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/rito-ussop-inc/TrustShield)
 
 A comprehensive threat detection and analysis system for URLs, messages, documents, and QR codes.
 

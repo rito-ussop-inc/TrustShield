@@ -17,8 +17,7 @@ COPY backend/ ./backend/
 
 # Install frontend dependencies (if building frontend)
 WORKDIR /app/frontend
-COPY frontend/package.json .
-CO/frontend/package-lock.json* 2>/dev/null || true
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 # Copy frontend source
