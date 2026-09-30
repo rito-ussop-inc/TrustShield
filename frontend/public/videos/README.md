@@ -1,13 +1,13 @@
-# TrustShield hero video asset
+# TrustShield background video assets
 
-The cinematic homepage layer (`CinematicVideoBackground.tsx`) expects the
-production video file here:
+The cinematic layers (`CinematicVideoBackground.tsx`) expect:
 
 ```text
-frontend/public/videos/trustshield-hero.mp4
+frontend/public/videos/trustshield-hero.mp4     — scroll-scrubbed hero story
+frontend/public/videos/trustshield-ambient.mp4  — quiet loop behind the rest of the page
 ```
 
-It is referenced at runtime as `/videos/trustshield-hero.mp4`.
+Both are referenced at runtime as `/videos/<name>.mp4`.
 An optional poster frame may be placed at:
 
 ```text
