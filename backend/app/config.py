@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     WEBRISK_API_KEY: str = ""
     MODEL_PATH: str = "ml/artifacts/message_classifier.joblib"
     MODEL_VERSION: str = "msg-tfidf-lr-v1.0.0"
-    SCORING_VERSION: str = "scoring-v1.0.0"
+    SCORING_VERSION: str = "scoring-v2.0.0"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
     MAX_UPLOAD_MB: int = 10
     REQUEST_TIMEOUT_SECONDS: int = 5

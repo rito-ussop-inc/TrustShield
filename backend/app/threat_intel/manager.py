@@ -10,7 +10,7 @@ from app.threat_intel.base import ThreatIntelResult
 # In-memory TTL cache: (provider, clean_url) -> (ThreatIntelResult, expire_time)
 _CACHE: dict[tuple[str, str], tuple[ThreatIntelResult, float]] = {}
 DEFAULT_CACHE_TTL_SECONDS = 300  # 5 minutes
-DEFAULT_PROVIDER_TIMEOUT = 5  # seconds
+DEFAULT_PROVIDER_TIMEOUT = 3  # seconds (strict per-provider cap per Before/After spec)
 CONCURRENCY_LIMIT = 5
 
 

@@ -8,7 +8,7 @@ from app.threat_intel.base import ThreatIntelResult
 class PhishTankProvider:
     name = "phishtank"
 
-    def __init__(self, api_key: str = "", timeout: int = 5):
+    def __init__(self, api_key: str = "", timeout: int = 3):
         self.api_key = api_key
         self.timeout = timeout
 
