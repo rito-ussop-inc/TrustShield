@@ -1,46 +1,95 @@
-# TrustShield — Verify Before You Trust
+# TrustShield
 
-Web-based digital trust assessment: URLs, messages, QR codes, document integrity → explainable risk assessment.
+![GitHub repo size](https://img.shields.io/github/repo-size/Ritoyash/TrustShield)
+![GitHub language count](https://img.shields.io/github/languages/count/Ritoyash/TrustShield)
+![GitHub top language](https://img.shields.io/github/languages/top/Ritoyash/TrustShield)
+![GitHub last commit](https://img.shields.io/github/last-commit/Ritoyash/TrustShield)
+![GitHub issues](https://img.shields.io/github/issues/Ritoyash/TrustShield)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Ritoyash/TrustShield)
 
-## Quick start (local)
+A comprehensive threat detection and analysis system for URLs, messages, documents, and QR codes.
 
-### 1. Backend (FastAPI)
-```powershell
-cd C:\Users\RITOYASH\OneDrive\Desktop\TrustShiled
-python -m venv .venv; .\.venv\Scripts\Activate.ps1
-pip install -r backend\requirements.txt
-python ml\training\train_message.py
-uvicorn app.main:app --reload --port 8000 --app-dir backend
+## Features
+
+- Multi-modal threat analysis (URL, message, document, QR code)
+- Machine learning classification for phishing and malware detection
+- Integration with threat intelligence feeds (PhishTank, URLhaus, Google Web Risk)
+- SSRF protection and secure fetching
+- Rate limiting and input validation
+- RESTful API with FastAPI backend
+- Modern React frontend with Tailwind CSS
+- Docker ready for easy deployment
+- GitHub Actions CI/CD pipeline
+
+## Architecture
+
+### Backend (Python/FastAPI)
+- `trust_engine/`: Core scoring and trust evaluation
+- `analyzers/`: Specialized analyzers for different content types
+- `ml/`: Machine learning models and inference
+- `threat_intel/`: Threat intelligence integrations
+- `services/`: Business logic and orchestration
+- `security/`: SSRF protection and security utilities
+- `database/`: Data persistence layer
+
+### Frontend (React/Vite/TypeScript)
+- `src/components/`: Reusable UI components
+- `src/pages/`: Application pages
+- `src/services/`: API service layer
+- `src/types/`: TypeScript type definitions
+- `src/utils/`: Utility functions (risk calculation, etc.)
+
+## Getting Started
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- npm or yarn
+
+### Backend Setup
+1. Clone the repository
+2. Create a virtual environment: `python -m venv venv`
+3. Activate the virtual environment
+4. Install dependencies: `pip install -r backend/requirements.txt`
+5. Copy `.env.example` to `.env` and fill in required API keys
+6. Run migrations (if any): `alembic upgrade head` (if using Alembic)
+7. Start the server: `uvicorn backend.app.main:app --reload`
+
+### Frontend Setup
+1. Navigate to `frontend` directory
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+
+### Docker Deployment
+```bash
+docker build -t trustshield .
+docker run -p 8000:8000 --env-file .env trustshield
 ```
-Health: http://localhost:8000/health
 
-### 2. Frontend (React + Vite)
-```powershell
-cd frontend
-npm install
-npm run dev   # http://localhost:5173 (proxies /api → :8000)
+### Environment Variables
+See `.env.example` for required variables.
+
+## API Documentation
+Once the backend is running, visit:
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+## Testing
+Run tests with:
+```bash
+# Backend
+pytest backend/
+
+# Frontend
+npm test --prefix frontend
 ```
 
-### 3. Docker
-```powershell
-docker compose -f docker\docker-compose.yml up --build
-```
+## CI/CD
+GitHub Actions workflow configured in `.github/workflows/ci.yml` runs tests on every push and pull request.
 
-## API
-- POST /api/v1/analyze/url {url}
-- POST /api/v1/analyze/message {text}
-- POST /api/v1/analyze/qr (multipart file)
-- POST /api/v1/analyze/document (multipart file + optional reference_sha256)
-- GET /api/v1/analyses / GET /api/v1/analyses/{id}
-- GET /health, GET /api/v1/providers/status
+## License
+MIT
 
-## Primary demo (PRD §14)
-1. Paste: “Your account will be blocked within 24 hours. Verify immediately at http://secure-login-verify.tk/login”
-2. System extracts URL, flags urgency/credential signals, analyzes URL lexicals, queries threat intel, combines in Trust Engine.
-3. UI shows risk + evidence + recommendation (verify independently, don't enter credentials).
-
-## Notes
-- Unknown inputs are NEVER labeled safe — LOW only on low observed risk, else MEDIUM/HIGH/CRITICAL/UNKNOWN.
-- Document hash match = integrity only, not authenticity.
-- Providers degrade to `unavailable`/`not_configured`; local analysis continues.
-- Secrets only via env (.env — see .env.example). Never in frontend.
+## Acknowledgments
+- Built for hackathon victory 🏆
+- Inspired by TRD specifications
