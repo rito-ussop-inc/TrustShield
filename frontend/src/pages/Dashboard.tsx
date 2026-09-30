@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrustShieldHero } from '../components/hero/TrustShieldHero';
+import { CinematicVideoBackground } from '../components/hero/CinematicVideoBackground';
 import { AnalyzerConsole } from '../components/analyzer/AnalyzerConsole';
 import {
   ProductOverview, HowItWorks, TrustArchitecture, TechnologySection, Footer,
@@ -37,6 +38,10 @@ export function Dashboard() {
 
   return (
     <div>
+      {/* Scroll-synchronized video layer (fixed, behind content, exits at analyzer).
+          Renders nothing when the asset is missing, on reduced motion, or data-saver. */}
+      <CinematicVideoBackground />
+      <div className="relative z-10">
       <a href="#analyze" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:bg-mist-100 focus:text-ink-950 focus:px-3 focus:py-2 focus:rounded">
         Skip to analyzer
       </a>
@@ -111,6 +116,7 @@ export function Dashboard() {
       </main>
 
       <Footer />
+      </div>
     </div>
   );
 }

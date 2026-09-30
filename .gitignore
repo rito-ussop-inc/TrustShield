@@ -10,6 +10,12 @@ frontend/dist/
 *.tsbuildinfo
 backend/ml/
 
+# Large hero media (see frontend/public/videos/README.md)
+frontend/public/videos/*.mp4
+frontend/public/videos/*.webm
+frontend/public/videos/*.jpg
+frontend/public/videos/*.png
+
 # Runtime / local
 .env
 *.db
