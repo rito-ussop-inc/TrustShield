@@ -1,20 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { InputSelector, UrlForm, MessageForm, QrForm, DocumentForm, type Tab } from '../components/inputs';
-import type { AnalysisResult } from '../types';
+import type { AnalysisResult, HistoryItem } from '../types';
 import { ResultView } from './ResultPage';
 import { api } from '../services/api';
-import { useEffect } from 'react';
+import { riskColor } from '../utils/risk';
 
 export function Dashboard() {
   const [tab, setTab] = useState<Tab>('URL');
   const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [history, setHistory] = useState<{ analysisId: string; inputType: string; riskLevel: string; riskScore: number | null; createdAt: string }[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadHistory = () => {
     api.history().then(setHistory).catch(() => {});
+  };
+
+  useEffect(() => {
+    loadHistory();
   }, [result]);
+
+  const formatTime = (isoString: string) => {
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + date.toLocaleDateString();
+    } catch {
+      return isoString;
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
@@ -29,40 +42,58 @@ export function Dashboard() {
 
       <div className="bg-white rounded-2xl border p-5 space-y-4 shadow-sm">
         <InputSelector tab={tab} setTab={(t) => { setTab(t); setResult(null); }} />
-        {tab === 'URL' && <UrlForm onResult={(r) => { setResult(r); }} />}
-        {tab === 'MESSAGE' && <MessageForm onResult={(r) => { setResult(r); }} />}
-        {tab === 'QR' && <QrForm onResult={(r) => { setResult(r); }} />}
-        {tab === 'DOCUMENT' && <DocumentForm onResult={(r) => { setResult(r); }} />}
+        {tab === 'URL' && <UrlForm onResult={(r) => { setResult(r); loadHistory(); }} />}
+        {tab === 'MESSAGE' && <MessageForm onResult={(r) => { setResult(r); loadHistory(); }} />}
+        {tab === 'QR' && <QrForm onResult={(r) => { setResult(r); loadHistory(); }} />}
+        {tab === 'DOCUMENT' && <DocumentForm onResult={(r) => { setResult(r); loadHistory(); }} />}
       </div>
 
       {result && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">Latest result</h2>
-            <button onClick={() => navigate(`/analysis/${result.analysisId}`)} className="text-sm text-shield-600 underline">
-              Open full result page →
+            <h2 className="font-semibold text-lg">Latest result</h2>
+            <button onClick={() => navigate(`/analysis/${result.analysisId}`)} className="text-sm text-shield-600 hover:underline">
+              Open standalone result page →
             </button>
           </div>
           <ResultView result={result} />
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border p-5">
-        <h2 className="font-semibold mb-2">Recent analyses</h2>
+      <div className="bg-white rounded-2xl border p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-base">Recent verifications</h2>
+          <span className="text-xs text-slate-500">{history.length} stored records</span>
+        </div>
+
         {history.length === 0 ? (
-          <p className="text-sm text-slate-500">No history yet — run your first verification above.</p>
+          <p className="text-sm text-slate-500 py-2">No verifications yet — run your first analysis above.</p>
         ) : (
-          <ul className="text-sm divide-y">
+          <div className="divide-y divide-slate-100">
             {history.map((h) => (
-              <li key={h.analysisId} className="py-2 flex items-center justify-between">
-                <button className="text-left hover:underline" onClick={() => navigate(`/analysis/${h.analysisId}`)}>
-                  <span className="font-mono text-xs text-slate-500">{h.analysisId.slice(0, 8)}</span>{' '}
-                  <span className="font-medium">{h.inputType}</span> · {h.riskLevel} ({h.riskScore ?? '—'})
-                </button>
-                <span className="text-xs text-slate-400">{new Date(h.createdAt).toLocaleString()}</span>
-              </li>
+              <div
+                key={h.analysisId}
+                onClick={() => navigate(`/analysis/${h.analysisId}`)}
+                className="py-3 px-2 -mx-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 border text-slate-700">
+                    {h.inputType}
+                  </span>
+                  <span className="text-sm font-medium text-slate-800 truncate max-w-md font-mono">
+                    {h.inputSummary || h.analysisId.slice(0, 8)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${riskColor(h.riskLevel)}`}>
+                    {h.riskLevel} {h.riskScore != null ? `(${h.riskScore}/100)` : ''}
+                  </span>
+                  <span className="text-xs text-slate-400">{formatTime(h.createdAt)}</span>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

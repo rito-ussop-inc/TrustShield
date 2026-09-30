@@ -2,6 +2,7 @@
 from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
+import sqlalchemy
 from sqlalchemy import create_engine, String, Text, Float, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
@@ -22,6 +23,7 @@ class Analysis(Base):
     confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
     model_version: Mapped[str | None] = mapped_column(String(64), nullable=True)
     input_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    input_summary: Mapped[str | None] = mapped_column(String(256), nullable=True)
 
 
 class EvidenceRow(Base):
@@ -76,6 +78,13 @@ def init_db():
     global _engine, _Session
     _engine = get_engine()
     Base.metadata.create_all(_engine)
+    # Safe SQLite column migration for input_summary
+    try:
+        with _engine.connect() as conn:
+            conn.execute(sqlalchemy.text("ALTER TABLE analyses ADD COLUMN input_summary VARCHAR(256)"))
+            conn.commit()
+    except Exception:
+        pass
     _Session = sessionmaker(bind=_engine, expire_on_commit=False)
     return _engine
 

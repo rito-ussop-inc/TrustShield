@@ -1,16 +1,18 @@
-fastapi==0.115.6
-uvicorn[standard]==0.34.0
-pydantic==2.10.4
-pydantic-settings==2.7.0
-sqlalchemy==2.0.36
-httpx==0.28.1
-python-multipart==0.0.20
-scikit-learn==1.6.0
-numpy==2.2.1
-pillow==11.1.0
-opencv-python==4.10.0.84
+fastapi>=0.115.0
+uvicorn[standard]>=0.34.0
+pydantic>=2.10.0
+pydantic-settings>=2.7.0
+sqlalchemy>=2.0.36
+httpx>=0.28.1
+python-multipart>=0.0.20
+scikit-learn>=1.6.0
+numpy>=2.2.0
+pillow>=11.0.0
+opencv-python>=4.10.0
 python-magic-bin==0.4.14; sys_platform == 'win32'
 python-magic==0.4.27; sys_platform != 'win32'
-slowapi==0.1.9
-qrcode==8.0
-joblib==1.4.2
+slowapi>=0.1.9
+qrcode>=8.0
+joblib>=1.4.2
+tldextract>=5.1.2
+pytest>=8.0

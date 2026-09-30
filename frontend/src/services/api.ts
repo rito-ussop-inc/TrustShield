@@ -1,4 +1,4 @@
-import type { AnalysisResult } from '../types';
+import type { AnalysisResult, HistoryItem } from '../types';
 
 const BASE = '';
 
@@ -38,7 +38,7 @@ export const api = {
     return fetch(`${BASE}/api/v1/analyze/document`, { method: 'POST', body: fd }).then(handle);
   },
 
-  history: (): Promise<{ analysisId: string; inputType: string; riskLevel: string; riskScore: number | null; createdAt: string }[]> =>
+  history: (): Promise<HistoryItem[]> =>
     fetch(`${BASE}/api/v1/analyses?limit=20`).then(handle),
 
   getAnalysis: (id: string): Promise<AnalysisResult> =>

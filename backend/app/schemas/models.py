@@ -1,4 +1,4 @@
-"""Pydantic schemas — API contracts (TRD §4, §13, §14)."""
+"""Pydantic schemas — API contracts (TRD §4, §13, §14, PRD §7)."""
 from __future__ import annotations
 from typing import Literal
 from pydantic import BaseModel, Field
@@ -18,6 +18,24 @@ class Evidence(BaseModel):
     confidence: float | None = None
 
 
+class ProviderCheckDetail(BaseModel):
+    provider: str
+    status: str
+    matched: bool = False
+    category: str | None = None
+    detail: str | None = None
+    checkedAt: str | None = None
+
+
+class PlainLanguageSummary(BaseModel):
+    headline: str
+    explanation: str
+    actionAdvice: str
+    verdictBadge: str
+    targetIdentity: str | None = None
+    securityNotice: str | None = None
+
+
 class AnalysisResult(BaseModel):
     analysisId: str
     inputType: InputType
@@ -32,6 +50,18 @@ class AnalysisResult(BaseModel):
     decodedPayload: str | None = None
     payloadType: str | None = None
     fileSha256: str | None = None
+
+    # Enhanced URL & transparency attributes (PRD §7)
+    rawUrl: str | None = None
+    normalizedUrl: str | None = None
+    normalizationWarnings: list[str] = Field(default_factory=list)
+    modelStatus: str | None = None
+    modelVersion: str | None = None
+    scoringVersion: str | None = None
+    providerResults: list[ProviderCheckDetail] = Field(default_factory=list)
+
+    # Plain-language layman summary
+    plainSummary: PlainLanguageSummary | None = None
 
 
 class UrlRequest(BaseModel):
@@ -53,3 +83,4 @@ class HistoryItem(BaseModel):
     riskLevel: RiskLevel
     riskScore: int | None
     createdAt: str
+    inputSummary: str | None = None

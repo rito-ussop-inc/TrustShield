@@ -71,8 +71,17 @@ def list_analyses(limit: int = 20):
         s = get_session()
         try:
             rows = s.query(Analysis).order_by(Analysis.created_at.desc()).limit(limit).all()
-            return [{"analysisId": r.id, "inputType": r.input_type, "riskLevel": r.risk_level,
-                     "riskScore": r.risk_score, "createdAt": r.created_at.isoformat() if r.created_at else ""} for r in rows]
+            return [
+                {
+                    "analysisId": r.id,
+                    "inputType": r.input_type,
+                    "riskLevel": r.risk_level,
+                    "riskScore": r.risk_score,
+                    "inputSummary": r.input_summary or (r.input_hash[:16] if r.input_hash else "—"),
+                    "createdAt": r.created_at.isoformat() if r.created_at else "",
+                }
+                for r in rows
+            ]
         finally:
             s.close()
     except Exception as e:
