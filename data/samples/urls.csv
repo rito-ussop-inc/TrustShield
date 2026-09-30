@@ -1,0 +1,6 @@
+url,label,threat_type,source
+https://example.com,benign,,manual
+https://www.wikipedia.org,benign,,manual
+http://secure-login-verify.tk/login,phishing,credential_theft,demo-fixture
+http://bank-verify-login.ml/signin,phishing,credential_theft,demo-fixture
+http://192.168.1.1/secure/,suspicious,anomaly,demo-fixture

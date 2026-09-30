@@ -1,0 +1,22 @@
+# Dependencies
+frontend/node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Build output
+frontend/dist/
+*.tsbuildinfo
+backend/ml/
+
+# Runtime / local
+.env
+*.db
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

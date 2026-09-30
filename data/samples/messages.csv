@@ -1,0 +1,7 @@
+text,label
+"Hi, are we still meeting for lunch tomorrow?",LEGITIMATE
+"Please find attached the meeting notes.",LEGITIMATE
+"Win a free iPhone now! Click to claim urgently!",SPAM
+"Congratulations you won a lottery, claim cashback now!",SPAM
+"Your account will be blocked within 24 hours. Verify immediately at http://secure-login-verify.tk/login",PHISHING
+"Urgent: bank account suspended. Confirm password and OTP here: http://bank-verify-login.ml/signin",PHISHING
