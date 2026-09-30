@@ -31,7 +31,7 @@ const AMBIENT_SRC = '/videos/trustshield-ambient.mp4';
 const LERP = 0.16;
 const SEEK_MIN_INTERVAL_MS = 60;
 const SEEK_DELTA_S = 0.08;
-const AMBIENT_CAP = 0.26;
+const AMBIENT_CAP = 0.38;
 
 function clamp01(v: number): number {
   return Math.min(1, Math.max(0, v));
@@ -262,7 +262,7 @@ export function CinematicVideoBackground() {
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(180deg, rgba(5,7,13,0.82) 0%, rgba(5,7,13,0.68) 50%, rgba(5,7,13,0.88) 100%)',
+                'linear-gradient(180deg, rgba(5,7,13,0.72) 0%, rgba(5,7,13,0.55) 50%, rgba(5,7,13,0.8) 100%)',
             }}
           />
         </div>
