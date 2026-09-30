@@ -31,7 +31,7 @@ fully functional — no controls, errors, or blank screens are shown.
 
 ## Note on version control
 
-`*.mp4` / `*.webm` / poster images in this folder are intentionally
-git-ignored so the repo does not bloat. Host the asset alongside the
-deployed frontend (same `/videos/` path) or remove the ignore rule if you
-prefer to version a small file.
+Large `*.mp4` / `*.webm` files in this folder are git-ignored by default so
+the repo does not bloat. The current `trustshield-hero.mp4` (~1.7 MB, audio
+stripped, badge removed) is force-tracked as a deliberate exception so the
+site works out of the box.
