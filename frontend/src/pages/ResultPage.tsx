@@ -19,26 +19,27 @@ export function ResultView({ result }: { result: AnalysisResult }) {
 
   return (
     <div className="space-y-4">
-      {/* 1. Prominent Plain-English Summary for Everyday Users */}
       {result.plainSummary && (
         <PlainLanguageBanner summary={result.plainSummary} level={result.riskLevel} />
       )}
 
-      {/* 2. Primary Assessment Overview Card */}
-      <div className="bg-white rounded-2xl border p-5 flex flex-col md:flex-row gap-6 shadow-sm">
-        <div className="flex-1 space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500">
-            <div>Input type: <b>{result.inputType}</b> · ID: <span className="font-mono">{result.analysisId.slice(0, 8)}</span></div>
+      <div className="surface rounded-xl p-5 flex flex-col md:flex-row gap-6">
+        <div className="flex-1 space-y-3 min-w-0">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="text-xs text-mist-500 font-mono">
+              Input type: <b className="text-mist-100">{result.inputType}</b> · ID: <span className="font-mono">{result.analysisId.slice(0, 8)}</span>
+            </div>
             <RiskBadge level={result.riskLevel} />
           </div>
 
           {result.decodedPayload && (
-            <p className="text-sm bg-slate-50 border rounded p-2 break-all">
-              <b>Decoded QR ({result.payloadType}):</b> {result.decodedPayload}
+            <p className="text-sm bg-ink-950 border border-white/10 rounded-lg p-2.5 break-all">
+              <b>Decoded QR ({result.payloadType}):</b>{' '}
+              <span className="font-mono text-xs">{result.decodedPayload}</span>
             </p>
           )}
           {result.fileSha256 && (
-            <p className="text-xs font-mono bg-slate-50 border rounded p-2 break-all">SHA-256: {result.fileSha256}</p>
+            <p className="text-xs font-mono bg-ink-950 border border-white/10 rounded-lg p-2.5 break-all text-mist-300">SHA-256: {result.fileSha256}</p>
           )}
 
           <UrlDetailsCard
@@ -50,27 +51,26 @@ export function ResultView({ result }: { result: AnalysisResult }) {
           />
         </div>
 
-        <div className="w-full md:w-72 space-y-3">
-          <div className="bg-white rounded-xl border p-4">
+        <div className="w-full md:w-72 shrink-0 space-y-3">
+          <div className="surface-raised rounded-xl p-4">
             <RiskScore score={result.riskScore} level={result.riskLevel} scoringVersion={result.scoringVersion} />
           </div>
-          {result.confidence != null && <p className="text-xs text-slate-500">Assessed confidence: {result.confidence}</p>}
+          {result.confidence != null && <p className="text-xs text-mist-500">Assessed confidence: {result.confidence}</p>}
         </div>
       </div>
 
-      {/* 3. Actionable Security Steps & Limitations */}
       <div className="grid md:grid-cols-2 gap-4">
         <RecommendationCard items={result.recommendation} />
         <LimitationsPanel items={result.limitations} />
       </div>
 
-      {/* 4. Collapsible/Expandable Technical Evidence and Provider Diagnostics */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-700">Technical Analysis & Inspection Breakdown</h3>
+          <h3 className="text-xs font-mono tracking-widest text-mist-500">TECHNICAL ANALYSIS</h3>
           <button
             onClick={() => setShowTechnical(!showTechnical)}
-            className="text-xs text-shield-600 hover:underline font-medium"
+            className="text-xs text-mist-300 hover:text-mist-100 underline underline-offset-4"
+            aria-expanded={showTechnical}
           >
             {showTechnical ? 'Hide technical diagnostics ▴' : 'Show technical diagnostics ▾'}
           </button>
@@ -99,11 +99,15 @@ export function ResultPage() {
   }, [id]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-4">
-      <Link to="/" className="text-sm text-shield-600 underline">← Back to dashboard</Link>
-      <h1 className="text-2xl font-bold">Analysis result</h1>
-      {error && <p className="text-sm text-red-600">Could not load stored analysis ({error}). If you just analyzed, use the dashboard result view.</p>}
-      {result ? <ResultView result={result} /> : !error && <p className="text-sm text-slate-500">Loading…</p>}
+    <div className="max-w-shell mx-auto px-4 sm:px-6 py-24 space-y-4">
+      <Link to="/" className="text-sm text-mist-300 hover:text-mist-100 underline underline-offset-4">← Back to analyzer</Link>
+      <h1 className="text-2xl font-extrabold tracking-tight">Analysis result</h1>
+      {error && (
+        <p role="alert" className="text-sm text-red-300 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+          Analysis unavailable — the stored result could not be loaded ({error}). If you just analyzed, use the analyzer result view.
+        </p>
+      )}
+      {result ? <ResultView result={result} /> : !error && <p className="text-sm text-mist-500">Loading…</p>}
     </div>
   );
 }

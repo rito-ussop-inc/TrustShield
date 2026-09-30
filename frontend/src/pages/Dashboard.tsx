@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { InputSelector, UrlForm, MessageForm, QrForm, DocumentForm, type Tab } from '../components/inputs';
+import { TrustShieldHero } from '../components/hero/TrustShieldHero';
+import { AnalyzerConsole } from '../components/analyzer/AnalyzerConsole';
+import {
+  ProductOverview, HowItWorks, TrustArchitecture, TechnologySection, Footer,
+} from '../components/sections';
 import type { AnalysisResult, HistoryItem } from '../types';
-import { ResultView } from './ResultPage';
 import { api } from '../services/api';
-import { riskColor } from '../utils/risk';
+import { riskColor, riskDisplayLabel } from '../utils/risk';
 
 export function Dashboard() {
-  const [tab, setTab] = useState<Tab>('URL');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const navigate = useNavigate();
@@ -18,7 +20,11 @@ export function Dashboard() {
 
   useEffect(() => {
     loadHistory();
-  }, [result]);
+  }, []);
+
+  useEffect(() => {
+    if (result) loadHistory();
+  }, [result?.analysisId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const formatTime = (isoString: string) => {
     try {
@@ -30,76 +36,81 @@ export function Dashboard() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      <header className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 text-shield-600 font-bold text-sm tracking-widest">🛡️ TRUSTSHIELD</div>
-        <h1 className="text-3xl font-bold">Verify Before You Trust</h1>
-        <p className="text-slate-600 text-sm max-w-2xl mx-auto">
-          Paste a link, message, QR code or document. TrustShield combines deterministic checks, ML signals and
-          threat intelligence into one explainable risk assessment. Unknown is never called “safe”.
-        </p>
-      </header>
+    <div>
+      <a href="#analyze" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[60] focus:bg-mist-100 focus:text-ink-950 focus:px-3 focus:py-2 focus:rounded">
+        Skip to analyzer
+      </a>
+      <TrustShieldHero />
 
-      <div className="bg-white rounded-2xl border p-5 space-y-4 shadow-sm">
-        <InputSelector tab={tab} setTab={(t) => { setTab(t); setResult(null); }} />
-        {tab === 'URL' && <UrlForm onResult={(r) => { setResult(r); loadHistory(); }} />}
-        {tab === 'MESSAGE' && <MessageForm onResult={(r) => { setResult(r); loadHistory(); }} />}
-        {tab === 'QR' && <QrForm onResult={(r) => { setResult(r); loadHistory(); }} />}
-        {tab === 'DOCUMENT' && <DocumentForm onResult={(r) => { setResult(r); loadHistory(); }} />}
-      </div>
+      <main>
+        <ProductOverview />
 
-      {result && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-lg">Latest result</h2>
-            <button onClick={() => navigate(`/analysis/${result.analysisId}`)} className="text-sm text-shield-600 hover:underline">
-              Open standalone result page →
-            </button>
+        <section id="analyze" aria-labelledby="analyze-h" className="border-t border-white/5 scroll-mt-14">
+          <div className="max-w-shell mx-auto px-4 sm:px-6 py-20 sm:py-28 space-y-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-mono tracking-[0.25em] text-mist-500">ANALYZER CONSOLE</p>
+              <h2 id="analyze-h" className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight">ANALYZE DIGITAL INPUT</h2>
+              <p className="mt-3 text-mist-300 text-sm sm:text-base">
+                Submit an input and review the evidence behind the assessment. Every check runs against the live analysis service.
+              </p>
+            </div>
+            <AnalyzerConsole result={result} onResult={setResult} />
           </div>
-          <ResultView result={result} />
-        </div>
-      )}
+        </section>
 
-      <div className="bg-white rounded-2xl border p-5 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-base">Recent verifications</h2>
-          <span className="text-xs text-slate-500">{history.length} stored records</span>
-        </div>
+        <HowItWorks />
+        <TrustArchitecture />
 
-        {history.length === 0 ? (
-          <p className="text-sm text-slate-500 py-2">No verifications yet — run your first analysis above.</p>
-        ) : (
-          <div className="divide-y divide-slate-100">
-            {history.map((h) => (
-              <div
-                key={h.analysisId}
-                onClick={() => navigate(`/analysis/${h.analysisId}`)}
-                className="py-3 px-2 -mx-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-slate-50 rounded-xl cursor-pointer transition-colors"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 border text-slate-700">
-                    {h.inputType}
-                  </span>
-                  <span className="text-sm font-medium text-slate-800 truncate max-w-md font-mono">
-                    {h.inputSummary || h.analysisId.slice(0, 8)}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
-                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold border ${riskColor(h.riskLevel)}`}>
-                    {h.riskLevel} {h.riskScore != null ? `(${h.riskScore}/100)` : ''}
-                  </span>
-                  <span className="text-xs text-slate-400">{formatTime(h.createdAt)}</span>
-                </div>
+        <section aria-labelledby="history-h" className="border-t border-white/5">
+          <div className="max-w-shell mx-auto px-4 sm:px-6 py-20 sm:py-28">
+            <div className="max-w-2xl">
+              <p className="text-xs font-mono tracking-[0.25em] text-mist-500">ACTIVITY</p>
+              <h2 id="history-h" className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight">RECENT ANALYSES</h2>
+            </div>
+            <div className="mt-8 surface rounded-2xl p-5 sm:p-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-mist-500 font-mono">{history.length} stored records</span>
               </div>
-            ))}
+              {history.length === 0 ? (
+                <div className="rounded-lg border border-white/5 px-4 py-8 text-center">
+                  <p className="font-mono text-xs tracking-widest text-mist-500">NO ANALYSES YET</p>
+                  <p className="mt-1.5 text-sm text-mist-300">Your completed analyses will appear here.</p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-white/5 list-none">
+                  {history.map((h) => (
+                    <li key={h.analysisId}>
+                      <button
+                        onClick={() => navigate(`/analysis/${h.analysisId}`)}
+                        className="w-full py-3 px-2 -mx-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-white/[0.03] rounded-xl cursor-pointer transition-colors text-left"
+                      >
+                        <span className="flex items-center gap-3 min-w-0">
+                          <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-white/5 border border-white/10 text-mist-300">
+                            {h.inputType}
+                          </span>
+                          <span className="text-sm text-mist-100 truncate max-w-md font-mono">
+                            {h.inputSummary || h.analysisId.slice(0, 8)}
+                          </span>
+                        </span>
+                        <span className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+                          <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-mono font-bold border ${riskColor(h.riskLevel)}`}>
+                            {riskDisplayLabel(h.riskLevel)}{h.riskScore != null ? ` ${h.riskScore}/100` : ''}
+                          </span>
+                          <span className="text-xs text-mist-500">{formatTime(h.createdAt)}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        </section>
 
-      <footer className="text-center text-xs text-slate-400">
-        Never enter credentials or pay from an unverified link. Verify through an independent official channel.
-      </footer>
+        <TechnologySection />
+      </main>
+
+      <Footer />
     </div>
   );
 }

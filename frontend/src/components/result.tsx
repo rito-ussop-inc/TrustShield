@@ -1,10 +1,12 @@
 import type { RiskLevel, ProviderCheckDetail, PlainLanguageSummary } from '../types';
-import { riskColor, riskLabel } from '../utils/risk';
+import { riskColor, riskDisplayLabel, riskDot, riskLabel } from '../utils/risk';
 
-export function RiskBadge({ level }: { level: RiskLevel }) {
+export function RiskBadge({ level, compact = false }: { level: RiskLevel; compact?: boolean }) {
   return (
-    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${riskColor(level)}`}>
-      {level} · {riskLabel(level)}
+    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider border ${riskColor(level)}`}>
+      <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full ${riskDot(level)}`} />
+      {riskDisplayLabel(level)}
+      {!compact && <span className="font-sans font-normal normal-case tracking-normal opacity-80">· {riskLabel(level)}</span>}
     </span>
   );
 }
@@ -17,46 +19,41 @@ export function PlainLanguageBanner({
   level: RiskLevel;
 }) {
   if (!summary) return null;
-
-  const bgBorder =
+  const frame =
     level === 'CRITICAL' || level === 'HIGH'
-      ? 'bg-red-50 border-red-200 text-red-950'
+      ? 'border-red-500/40 bg-red-500/[0.07]'
       : level === 'MEDIUM'
-      ? 'bg-amber-50 border-amber-200 text-amber-950'
+      ? 'border-amber-400/30 bg-amber-400/[0.06]'
       : level === 'LOW'
-      ? 'bg-emerald-50 border-emerald-200 text-emerald-950'
-      : 'bg-slate-50 border-slate-200 text-slate-900';
-
-  const badgeBg =
-    level === 'CRITICAL' || level === 'HIGH'
-      ? 'bg-red-600 text-white'
-      : level === 'MEDIUM'
-      ? 'bg-amber-600 text-white'
-      : level === 'LOW'
-      ? 'bg-emerald-600 text-white'
-      : 'bg-slate-600 text-white';
-
+      ? 'border-emerald-400/25 bg-emerald-400/[0.05]'
+      : 'border-white/10 bg-white/[0.03]';
+  const badge =
+    level === 'CRITICAL' ? 'bg-red-500 text-white'
+      : level === 'HIGH' ? 'bg-rose-500 text-white'
+      : level === 'MEDIUM' ? 'bg-amber-400 text-ink-950'
+      : level === 'LOW' ? 'bg-emerald-400 text-ink-950'
+      : 'bg-slate-400 text-ink-950';
   return (
-    <div className={`rounded-2xl border-2 p-5 space-y-3 shadow-sm ${bgBorder}`}>
+    <div className={`rounded-xl border p-5 space-y-3 ${frame}`}>
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${badgeBg}`}>
-          {summary.verdictBadge || level}
+        <span className={`text-[11px] font-mono font-bold tracking-widest px-2.5 py-1 rounded ${badge}`}>
+          {summary.verdictBadge || riskDisplayLabel(level)}
         </span>
-        <span className="text-xs opacity-75 font-medium">Simple Explanation for Everyday Users</span>
+        <span className="text-[11px] font-mono tracking-widest text-mist-500">PLAIN-LANGUAGE SUMMARY</span>
       </div>
-
       <h2 className="text-xl font-bold leading-snug">{summary.headline}</h2>
-      <p className="text-sm leading-relaxed opacity-90">{summary.explanation}</p>
-
+      <p className="text-sm leading-relaxed text-mist-300">{summary.explanation}</p>
+      {summary.targetIdentity && (
+        <p className="text-xs text-mist-300">Real destination: <span className="font-mono text-mist-100">{summary.targetIdentity}</span></p>
+      )}
       {summary.securityNotice && (
-        <div className="p-3 bg-white/80 rounded-xl border border-amber-300 text-xs text-amber-900 font-medium">
+        <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
           {summary.securityNotice}
         </div>
       )}
-
-      <div className="p-3 bg-white/90 rounded-xl border border-slate-200 space-y-1">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-600">What you should do:</div>
-        <div className="text-sm font-semibold text-slate-900">{summary.actionAdvice}</div>
+      <div className="rounded-lg border border-white/10 bg-ink-950/60 px-3 py-2.5">
+        <div className="text-[11px] font-mono tracking-widest text-mist-500">WHAT YOU SHOULD DO</div>
+        <div className="mt-1 text-sm font-medium">{summary.actionAdvice}</div>
       </div>
     </div>
   );
@@ -73,21 +70,22 @@ export function RiskScore({
 }) {
   const v = score ?? 0;
   const bar =
-    level === 'CRITICAL' ? 'bg-red-600' :
-    level === 'HIGH' ? 'bg-orange-500' :
+    level === 'CRITICAL' ? 'bg-red-500' :
+    level === 'HIGH' ? 'bg-rose-400' :
     level === 'MEDIUM' ? 'bg-amber-400' :
-    level === 'LOW' ? 'bg-emerald-500' : 'bg-slate-400';
+    level === 'LOW' ? 'bg-emerald-400' : 'bg-slate-400';
   return (
     <div>
       <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-bold">{score ?? '—'}</span>
-        <span className="text-sm text-slate-500">/ 100</span>
+        <span className="text-4xl font-extrabold tabular-nums">{score ?? '—'}</span>
+        <span className="text-sm text-mist-500">/ 100</span>
       </div>
-      <div className="mt-2 h-3 w-full bg-slate-200 rounded-full overflow-hidden">
+      <p className="mt-0.5 text-[11px] font-mono tracking-widest text-mist-500">RISK SCORE</p>
+      <div className="mt-2 h-2 w-full bg-white/10 rounded-full overflow-hidden" role="img" aria-label={`Risk score ${score ?? 'unknown'} out of 100`}>
         <div className={`h-full ${bar} transition-all`} style={{ width: `${v}%` }} />
       </div>
-      <p className="mt-2 text-xs text-slate-500">
-        Non-duplicative evidence score ({scoringVersion ?? 'calibrated'}). High scores indicate observed risk; a low score does not guarantee safety.
+      <p className="mt-2 text-xs text-mist-500">
+        Evidence score ({scoringVersion ?? 'calibrated'}). High scores indicate observed risk; a low score does not guarantee safety.
       </p>
     </div>
   );
@@ -108,39 +106,34 @@ export function UrlDetailsCard({
 }) {
   if (!rawUrl && !normalizedUrl) return null;
   return (
-    <div className="bg-slate-50 rounded-xl border p-4 space-y-2 text-sm">
+    <div className="surface-raised rounded-xl p-4 space-y-2.5 text-sm">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <span className="font-semibold text-slate-700">Target Details</span>
+        <span className="font-semibold text-mist-300 text-xs font-mono tracking-widest">TARGET DETAILS</span>
         {modelVersion && (
-          <span className={`text-xs px-2 py-0.5 rounded border font-mono ${modelStatus === 'available' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-slate-100 border-slate-300 text-slate-600'}`}>
+          <span className="text-[11px] px-2 py-0.5 rounded border border-white/10 bg-white/5 text-mist-300 font-mono">
             Model: {modelVersion} ({modelStatus ?? 'unknown'})
           </span>
         )}
       </div>
-
       <div className="space-y-1">
-        <div className="text-xs text-slate-500">Submitted URL:</div>
-        <div className="font-mono text-xs break-all bg-white p-2 rounded border border-slate-200 text-slate-800 select-all">
+        <div className="text-[11px] text-mist-500">Submitted URL</div>
+        <div className="font-mono text-xs break-all bg-ink-950 p-2 rounded border border-white/10 text-mist-100 select-all">
           {rawUrl || normalizedUrl}
         </div>
       </div>
-
       {normalizedUrl && rawUrl && normalizedUrl !== rawUrl && (
         <div className="space-y-1">
-          <div className="text-xs text-slate-500">Normalized Canonical Form:</div>
-          <div className="font-mono text-xs break-all bg-white p-2 rounded border border-slate-200 text-slate-600 select-all">
+          <div className="text-[11px] text-mist-500">Normalized canonical form</div>
+          <div className="font-mono text-xs break-all bg-ink-950 p-2 rounded border border-white/10 text-mist-300 select-all">
             {normalizedUrl}
           </div>
         </div>
       )}
-
       {warnings && warnings.length > 0 && (
-        <div className="mt-2 pt-2 border-t border-slate-200 space-y-1">
-          <div className="text-xs font-semibold text-amber-700">Normalization notes:</div>
-          <ul className="list-disc pl-4 text-xs text-amber-800 space-y-0.5">
-            {warnings.map((w, idx) => (
-              <li key={idx}>{w}</li>
-            ))}
+        <div className="pt-2 border-t border-white/10 space-y-1">
+          <div className="text-[11px] font-semibold text-amber-300">Normalization notes</div>
+          <ul className="list-disc pl-4 text-xs text-amber-200/90 space-y-0.5">
+            {warnings.map((w, idx) => <li key={idx}>{w}</li>)}
           </ul>
         </div>
       )}
@@ -150,9 +143,9 @@ export function UrlDetailsCard({
 
 export function FindingsList({ findings }: { findings: string[] }) {
   return (
-    <div className="bg-white rounded-xl border p-4">
-      <h3 className="font-semibold mb-2">Technical observations</h3>
-      <ul className="list-disc pl-5 space-y-1 text-sm">
+    <div className="surface rounded-xl p-4">
+      <h3 className="font-mono text-xs tracking-widest text-mist-500 mb-2">FINDINGS</h3>
+      <ul className="list-disc pl-5 space-y-1 text-sm text-mist-100">
         {findings.map((f, i) => <li key={i}>{f}</li>)}
       </ul>
     </div>
@@ -161,21 +154,22 @@ export function FindingsList({ findings }: { findings: string[] }) {
 
 export function EvidencePanel({ evidence }: { evidence: import('../types').Evidence[] }) {
   const color = (s: string) =>
-    s === 'HIGH' ? 'border-red-300 bg-red-50' :
-    s === 'MEDIUM' ? 'border-amber-300 bg-amber-50' :
-    s === 'LOW' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-slate-50';
+    s === 'HIGH' ? 'border-red-500/30 bg-red-500/[0.05]' :
+    s === 'MEDIUM' ? 'border-amber-400/25 bg-amber-400/[0.05]' :
+    s === 'LOW' ? 'border-emerald-400/20 bg-emerald-400/[0.04]' : 'border-white/10 bg-white/[0.02]';
   return (
-    <div className="bg-white rounded-xl border p-4">
-      <h3 className="font-semibold mb-2">Evidence breakdown ({evidence.length})</h3>
+    <div className="surface rounded-xl p-4">
+      <h3 className="font-mono text-xs tracking-widest text-mist-500 mb-1">WHY THIS RESULT?</h3>
+      <p className="text-xs text-mist-500 mb-3">Evidence breakdown ({evidence.length})</p>
       <div className="space-y-2">
         {evidence.map((e) => (
           <details key={e.id} className={`border rounded-lg p-3 text-sm ${color(e.severity)}`}>
             <summary className="cursor-pointer font-medium">
               [{e.severity}] {e.title}
-              <span className="ml-2 text-xs text-slate-500">{e.category} · {e.source ?? 'local'}</span>
+              <span className="ml-2 text-[11px] font-mono text-mist-500">{e.category} · {e.source ?? 'local'}</span>
             </summary>
-            <p className="mt-1 text-slate-700">{e.description}</p>
-            {e.confidence != null && <p className="text-xs text-slate-500 mt-1">Confidence factor: {e.confidence}</p>}
+            <p className="mt-1 text-mist-300">{e.description}</p>
+            {e.confidence != null && <p className="text-[11px] text-mist-500 mt-1">Confidence factor: {e.confidence}</p>}
           </details>
         ))}
       </div>
@@ -185,9 +179,9 @@ export function EvidencePanel({ evidence }: { evidence: import('../types').Evide
 
 export function RecommendationCard({ items }: { items: string[] }) {
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-      <h3 className="font-semibold mb-2">Recommended security steps</h3>
-      <ul className="list-disc pl-5 space-y-1 text-sm text-blue-950">
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+      <h3 className="font-mono text-xs tracking-widest text-mist-500 mb-2">RECOMMENDED ACTION</h3>
+      <ul className="list-disc pl-5 space-y-1 text-sm">
         {items.map((r, i) => <li key={i}>{r}</li>)}
       </ul>
     </div>
@@ -202,35 +196,34 @@ export function ProviderStatus({
   results?: ProviderCheckDetail[];
 }) {
   const entries = Object.entries(status);
-  if (!entries.length) return <p className="text-sm text-slate-500">No live provider checks for this input.</p>;
-
+  if (!entries.length) return <p className="text-sm text-mist-500">No live provider checks for this input.</p>;
   return (
-    <div className="bg-white rounded-xl border p-4">
-      <h3 className="font-semibold mb-2">Threat-intelligence status</h3>
+    <div className="surface rounded-xl p-4">
+      <h3 className="font-mono text-xs tracking-widest text-mist-500 mb-2">THREAT-INTELLIGENCE STATUS</h3>
       <div className="flex flex-wrap gap-2 mb-3">
         {entries.map(([k, v]) => {
           const detailObj = results?.find((r) => r.provider === k);
           return (
             <div
               key={k}
-              className={`px-3 py-1.5 rounded text-xs border ${
+              className={`px-3 py-1.5 rounded text-xs border font-mono ${
                 v === 'match'
-                  ? 'bg-red-100 border-red-300 text-red-900 font-semibold'
+                  ? 'bg-red-500/15 border-red-500/40 text-red-200 font-bold'
                   : v === 'no_match'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                  : 'bg-slate-100 border-slate-300 text-slate-700'
+                  ? 'bg-emerald-400/10 border-emerald-400/25 text-emerald-200'
+                  : 'bg-white/[0.03] border-white/10 text-mist-300'
               }`}
             >
-              <div><b>{k}</b>: {v}</div>
-              {detailObj?.detail && <div className="text-[11px] opacity-80 mt-0.5">{detailObj.detail}</div>}
+              <div><b>{k}</b>: {v === 'no_match' ? 'no match observed' : v}</div>
+              {detailObj?.detail && <div className="text-[11px] opacity-80 mt-0.5 font-sans">{detailObj.detail}</div>}
               {detailObj?.checkedAt && <div className="text-[10px] opacity-60 mt-0.5">{detailObj.checkedAt.split('T')[0]}</div>}
             </div>
           );
         })}
       </div>
-      <p className="text-xs text-slate-500">
-        “no_match” indicates the provider has no current threat record for this link. This is <b>not</b> proof of safety.
-        “unavailable” indicates the provider could not be reached, and local evidence is used instead.
+      <p className="text-xs text-mist-500">
+        “No match observed” means the provider has no current threat record for this link — <b>not</b> proof of safety.
+        “Unavailable” means the provider could not be reached; local evidence was used instead.
       </p>
     </div>
   );
@@ -238,9 +231,9 @@ export function ProviderStatus({
 
 export function LimitationsPanel({ items }: { items: string[] }) {
   return (
-    <div className="bg-slate-100 border border-slate-200 rounded-xl p-4">
-      <h3 className="font-semibold mb-2">Limitations & unknowns</h3>
-      <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+    <div className="rounded-xl border border-white/10 bg-ink-950/60 p-4">
+      <h3 className="font-mono text-xs tracking-widest text-mist-500 mb-2">ABOUT THIS ASSESSMENT</h3>
+      <ul className="list-disc pl-5 space-y-1 text-sm text-mist-300">
         {items.map((l, i) => <li key={i}>{l}</li>)}
       </ul>
     </div>
